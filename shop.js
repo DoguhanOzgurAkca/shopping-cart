@@ -113,7 +113,7 @@ input.addEventListener("keydown", (ev) => {
 });
 
 reset.onclick = function () {
-  x = window.confirm("Listeyi sıfırlamak istediğine emin misin?");
+  x = window.confirm("Are you sure you wanna reset the shopping list?");
   if (x) {
     emptyArray(saved);
     emptyArray(savedBought);
