@@ -8,14 +8,6 @@ function emptyArray(Array) {
     console.log(Array.length);
   }
 }
-class Item {
-  constructor(text, id, place) {
-    this.text = text;
-    this.id = id;
-    this.place = place;
-  }
-}
-
 const deleter = (element, index, boughtOrNew, boughtOrNew2) => {
   element.remove();
   boughtOrNew2.splice(index, 1);
@@ -30,8 +22,10 @@ const cart = document.getElementById("shoppingCart");
 const bought = document.getElementById("boughtItems");
 const reset = document.getElementById("reset");
 
+let i = 0;
+
 function addToList(inputValue, savedBought, savedBoughtString, place) {
-  let i = 0;
+  console.log("BBBBBBBB");
   if (inputValue === "") {
     return console.error();
   }
@@ -113,10 +107,9 @@ input.addEventListener("keydown", (ev) => {
 });
 
 reset.onclick = function () {
-  x = window.confirm("Listeyi sıfırlamak istediğine emin misin?");
+  x = window.confirm("Are you sure you wanna reset the shopping list?");
   if (x) {
     emptyArray(saved);
-    emptyArray(savedBought);
     localStorage.setItem("saved", JSON.stringify(saved));
     document.querySelectorAll(".newP").forEach((e) => e.remove());
     document.querySelectorAll(".newButton").forEach((e) => e.remove());

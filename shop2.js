@@ -3,19 +3,11 @@ function getStored(savedFile) {
 }
 function emptyArray(Array) {
   arrayLength = Array.length;
-  for (c = 0; c < arrayLength + 1; c++) {
+  for (i = 0; i < arrayLength + 1; i++) {
     Array.shift();
     console.log(Array.length);
   }
 }
-class Item {
-  constructor(text, id, place) {
-    this.text = text;
-    this.id = id;
-    this.place = place;
-  }
-}
-
 const deleter = (element, index, boughtOrNew, boughtOrNew2) => {
   element.remove();
   boughtOrNew2.splice(index, 1);
@@ -30,13 +22,13 @@ const cart = document.getElementById("shoppingCart");
 const bought = document.getElementById("boughtItems");
 const reset = document.getElementById("reset");
 
-function addToList(inputValue, savedBought, savedBoughtString, place) {
+function addToList(inputValue, savedBought, savedBoughtString, createElements) {
   let i = 0;
+  console.log("BBBBBBBB");
   if (inputValue === "") {
     return console.error();
   }
-  createRowElements(i, inputValue, place);
-  console.log(i);
+  createElements(i, inputValue);
   i++;
   savedBought.push(inputValue);
   localStorage.setItem(savedBoughtString, JSON.stringify(savedBought));
@@ -45,11 +37,52 @@ function addToList(inputValue, savedBought, savedBoughtString, place) {
   console.log("bbb");
 }
 
-function createRowElements(nameIndex, paraText, place) {
+function createBoughtElement(nameIndex, paraText) {
+  const BoughtDiv = document.createElement("div");
+  BoughtDiv.setAttribute("id", "div" + nameIndex);
+  BoughtDiv.setAttribute("class", "row");
+  BoughtDiv.classList.add("newDiv");
+  cart.appendChild(BoughtDiv);
+  function createBoughtParagraph() {
+    const newItem = document.createElement("p");
+    const newDivP = document.createElement("div");
+    newItem.innerHTML = paraText;
+    newItem.classList.add("newP");
+    newDivP.setAttribute("class", "col");
+    newItem.setAttribute("id", "para" + nameIndex);
+    newItem.ondblclick = () => {
+      addToList(paraText, saved, "saved", createRowElements);
+      deleter(BoughtDiv, nameIndex, "savedBought", savedBought);
+    };
+    newDivP.appendChild(newItem);
+    BoughtDiv.appendChild(newDivP);
+  }
+  function createDeletionButton() {
+    const newDivButtonP = document.createElement("div");
+    const newButton = document.createElement("button");
+    const newSpan = document.createElement("span");
+    newSpan.innerHTML = "&times";
+    newDivButtonP.setAttribute("class", "col");
+    newButton.setAttribute("id", "button" + nameIndex);
+    newButton.setAttribute("type", "button");
+    newButton.setAttribute("class", "btn btn-danger newButton");
+    newSpan.setAttribute("aria-hidden", "true");
+    newButton.onclick = () => {
+      deleter(BoughtDiv, nameIndex, "savedBought", savedBought);
+    };
+    BoughtDiv.appendChild(newDivButtonP);
+    newDivButtonP.appendChild(newButton);
+    newButton.appendChild(newSpan);
+  }
+  createDeletionButton();
+  createBoughtParagraph();
+}
+
+function createRowElements(nameIndex, paraText) {
   const newDiv = document.createElement("div");
   newDiv.setAttribute("id", "div" + nameIndex);
   newDiv.setAttribute("class", "row");
-  place.appendChild(newDiv);
+  bought.appendChild(newDiv);
   function createNewParagraph() {
     const newItem = document.createElement("p");
     const newDivP = document.createElement("div");
@@ -58,17 +91,10 @@ function createRowElements(nameIndex, paraText, place) {
     newDiv.classList.add("newDiv");
     newDivP.setAttribute("class", "col");
     newItem.setAttribute("id", "para" + nameIndex);
-    if (place === cart) {
-      newItem.ondblclick = () => {
-        addToList(paraText, savedBought, "savedBought", bought);
-        deleter(newDiv, nameIndex, "saved", saved);
-      };
-    } else if (place === bought) {
-      newItem.ondblclick = () => {
-        addToList(paraText, saved, "saved", cart);
-        deleter(newDiv, nameIndex, "savedBought", savedBought);
-      };
-    }
+    newItem.ondblclick = () => {
+      addToList(paraText, savedBought, "savedBought", createBoughtElement);
+      deleter(newDiv, nameIndex, "saved", saved);
+    };
     newDivP.appendChild(newItem);
     newDiv.appendChild(newDivP);
   }
@@ -93,22 +119,22 @@ function createRowElements(nameIndex, paraText, place) {
   createNewParagraph();
 }
 
-function setStored(array, place) {
+function setStored(array, createElements) {
   arrayLength = array.length;
-  for (c = 0; c < arrayLength; c++) {
-    createRowElements(c, array[c], place);
+  for (i = 0; i < arrayLength; i++) {
+    createElements(i, array[i]);
   }
 }
 
-setStored(savedBought, bought);
-setStored(saved, cart);
+setStored(savedBought, createBoughtElement);
+setStored(saved, createRowElements);
 
 button.onclick = function () {
-  addToList(input.value, saved, "saved", cart);
+  addToList(input.value, saved, "saved", createRowElements);
 };
 input.addEventListener("keydown", (ev) => {
   if (ev.key === "Enter") {
-    addToList(input.value, saved, "saved", cart);
+    addToList(input.value, saved, "saved", createRowElements);
   }
 });
 
@@ -116,7 +142,6 @@ reset.onclick = function () {
   x = window.confirm("Listeyi sıfırlamak istediğine emin misin?");
   if (x) {
     emptyArray(saved);
-    emptyArray(savedBought);
     localStorage.setItem("saved", JSON.stringify(saved));
     document.querySelectorAll(".newP").forEach((e) => e.remove());
     document.querySelectorAll(".newButton").forEach((e) => e.remove());
